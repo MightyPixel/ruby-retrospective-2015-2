@@ -5,7 +5,10 @@ require 'set'
 module ObjectStore
   def self.init(&block)
     repository = MainInterface.new
-    block_given? ? repository.instance_eval(&block) : repository
+    if block_given?
+      repository.instance_eval(&block)
+    end
+    repository
   end
 end
 
