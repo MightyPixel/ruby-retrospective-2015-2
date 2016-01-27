@@ -56,9 +56,9 @@ module TurtleGraphics
     end
   end
 
-class Canvas
+  class Canvas
     def self.max_steps(canvas)
-      canvas.map { |row| row.max }.max
+      canvas.flatten.max
     end
 
     class ASCII
@@ -116,14 +116,19 @@ class Canvas
       def build(canvas)
         max_steps = Canvas.max_steps(canvas)
         table_rows = canvas.map do |row|
-          table_data = row.map do |cell|
-            '<td style="opacity: ' +
-              format('%.2f', cell.to_f / max_steps) +
-                '"></td>'
+          table_data = row.map do |cell_count|
+            build_cell(cell_count, max_steps)
           end
           '<tr>' + table_data.join + '</tr>'
         end
         @html_string % table_rows.join
+      end
+
+      private
+
+      def build_cell(cell_count, max_steps)
+        intensity = cell_count.to_f / max_steps
+        "<td style=\"opacity: #{format('%.2f', intensity)}\"></td>"
       end
     end
   end
