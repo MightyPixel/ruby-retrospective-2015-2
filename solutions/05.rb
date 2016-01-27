@@ -5,12 +5,7 @@ require 'set'
 module ObjectStore
   def self.init(&block)
     repository = MainInterface.new
-
-    if block_given?
-      repository.instance_eval(&block)
-    end
-
-    repository
+    block_given? ? repository.instance_eval(&block) : repository
   end
 end
 
@@ -52,8 +47,8 @@ class ObjectStore::Commit
     @hash = Digest::SHA1.hexdigest("#{formatted_date}#{@message}")
   end
 
-  def has_object?(name)
-    merged_stage.has_key?(name)
+  def object?(name)
+    merged_stage.key?(name)
   end
 
   def objects
@@ -128,10 +123,10 @@ class ObjectStore::Repository
     head.object(name)
   end
 
-  def has_object?(name)
+  def object?(name)
     return false if empty?
 
-    head.has_object?(name)
+    head.object?(name)
   end
 
   def objects
@@ -259,7 +254,7 @@ class ObjectStore::MainInterface
   end
 
   def remove(name)
-    unless @repository.has_object?(name)
+    unless @repository.object?(name)
       return error("Object #{name} is not committed.")
     end
 
@@ -299,7 +294,7 @@ class ObjectStore::MainInterface
   end
 
   def get(name)
-    unless @repository.has_object?(name)
+    unless @repository.object?(name)
       return error("Object #{name} is not committed.")
     end
 
